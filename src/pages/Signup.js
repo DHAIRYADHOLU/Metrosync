@@ -7,10 +7,54 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [signupSuccess, setSignupSuccess] = useState(false);
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
 
   const handleSignup = (e) => {
     e.preventDefault();
-    // Add signup logic here
+    const newErrors = {};
+
+    // Validate email
+    if (!validateEmail(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+
+    // Validate password
+    if (!validatePassword(password)) {
+      newErrors.password =
+        "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.";
+    }
+
+    // Validate confirm password
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      // If no errors, signup successful
+      setSignupSuccess(true);
+      console.log("Signup successful");
+
+      // Clear form fields after successful signup
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    } else {
+      setSignupSuccess(false); // Reset success message if there are errors
+    }
   };
 
   return (
@@ -39,6 +83,7 @@ const Signup = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg bg-transparent focus:outline-none text-white hover:bg-mgray"
             />
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
           </div>
           <div className="mb-4">
             <input
@@ -48,6 +93,9 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg bg-transparent focus:outline-none text-white hover:bg-mgray"
             />
+            {errors.password && (
+              <p className="text-red-500">{errors.password}</p>
+            )}
           </div>
           <div className="mb-4">
             <input
@@ -57,6 +105,9 @@ const Signup = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg bg-transparent focus:outline-none text-white hover:bg-mgray"
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500">{errors.confirmPassword}</p>
+            )}
           </div>
           <button
             type="submit"
@@ -64,6 +115,11 @@ const Signup = () => {
           >
             Signup
           </button>
+          {signupSuccess && (
+            <p className="text-green-500 mt-4 text-center">
+              Signup successful!
+            </p>
+          )}
           <button className="w-full flex items-center bg-mgray border border-gray-300 rounded-lg focus:outline-none text-white py-2 mt-4 hover:bg-mgray">
             <img
               src={googleLogo}
