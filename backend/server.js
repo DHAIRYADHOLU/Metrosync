@@ -1,33 +1,62 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 
 dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middleware to parse incoming requests
+app.use(bodyParser.json());
+
 // MongoDB connection
-const connectDB = async () => {
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connection successful");
+  })
+  .catch((error) => {
+    console.log("Connection failed:", error.message);
+  });
+
+// User schema
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+const User = mongoose.model("User", userSchema);
+
+// Signup route
+app.post("/signup", async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connection successful!");
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create a new user
+    const newUser = new User({ email, password: hashedPassword });
+    await newUser.save();
+
+    res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    console.error("Connection failed:", error.message);
-    process.exit(1); // Stop the server if connection fails
+    res.status(500).json({ message: "Server error" });
   }
-};
-
-// Call the connection function
-connectDB();
-
-app.get("/", (req, res) => {
-  res.send("Server is running...");
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
