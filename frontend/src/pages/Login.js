@@ -1,41 +1,34 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import googleLogo from "./assets/google.png";
 import MetrosyncL from "./assets/MertosyncL.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Reset error message
 
-    try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    // Call your login API here
+    const response = await fetch("http://localhost:5000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        // Successful login
-        setSuccess("Login successful");
-        setEmail("");
-        setPassword("");
-      } else {
-        // Error from the server
-        setError(data.message);
-      }
-    } catch (error) {
-      // Handle network or server error
-      setError("Something went wrong. Please try again.");
+    if (response.ok) {
+      // If login is successful, navigate to the dashboard
+      navigate("/dashboard");
+    } else {
+      // Handle errors (e.g., show a message)
+      console.error(data.message);
+      alert(data.message || "Login failed");
     }
   };
 
@@ -77,16 +70,10 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full flex items-center justify-center bg-mgray border rounded-lg focus:outline-none text-white py-2 rounded-lg mt-4 hover:bg-mgray"
+            className="w-full flex items-center justify-center bg-mgray border rounded-lg focus:outline-none text-white py-2 mt-4 hover:bg-mgray"
           >
             Login
           </button>
-
-          {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
-          {success && (
-            <p className="text-green-500 mt-4 text-center">{success}</p>
-          )}
-
           <button className="w-full flex items-center bg-mgray border border-gray-300 rounded-lg focus:outline-none text-white py-2 mt-4 hover:bg-mgray">
             <img
               src={googleLogo}
