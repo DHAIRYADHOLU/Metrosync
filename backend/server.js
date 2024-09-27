@@ -3,10 +3,13 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+app.use(cors()); // Use cors middleware
 
 // Middleware to parse incoming requests
 app.use(bodyParser.json());

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import googleLogo from "./assets/google.png";
 import MetrosyncL from "./assets/MertosyncL.png";
@@ -21,7 +22,7 @@ const Signup = () => {
     return regex.test(password);
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
@@ -44,14 +45,25 @@ const Signup = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // If no errors, signup successful
-      setSignupSuccess(true);
-      console.log("Signup successful");
+      try {
+        const response = await axios.post("http://localhost:5000/signup", {
+          email,
+          password,
+        });
 
-      // Clear form fields after successful signup
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+        if (response.status === 201) {
+          setSignupSuccess(true);
+          console.log("Signup successful");
+
+          // Clear form fields
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+        }
+      } catch (error) {
+        console.error("Signup failed", error);
+        setErrors({ signup: "Signup failed. Try again." });
+      }
     } else {
       setSignupSuccess(false); // Reset success message if there are errors
     }
@@ -120,14 +132,9 @@ const Signup = () => {
               Signup successful!
             </p>
           )}
-          <button className="w-full flex items-center bg-mgray border border-gray-300 rounded-lg focus:outline-none text-white py-2 mt-4 hover:bg-mgray">
-            <img
-              src={googleLogo}
-              alt="Google Logo"
-              className="w-8 h-8 mr-2 ml-2"
-            />
-            <span className="flex-grow text-center">Continue with Google</span>
-          </button>
+          {errors.signup && (
+            <p className="text-red-500 mt-4 text-center">{errors.signup}</p>
+          )}
         </form>
         <h4 className="mt-4 text-center text-white">
           Already have an account?{" "}
