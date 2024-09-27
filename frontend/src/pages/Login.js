@@ -6,10 +6,37 @@ import MetrosyncL from "./assets/MertosyncL.png";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Add login logic here
+    setError(""); // Reset error message
+
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Successful login
+        setSuccess("Login successful");
+        setEmail("");
+        setPassword("");
+      } else {
+        // Error from the server
+        setError(data.message);
+      }
+    } catch (error) {
+      // Handle network or server error
+      setError("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -50,10 +77,16 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full flex items-center justify-center bg-mgray border rounded-lg focus:outline-none  text-white py-2 rounded-lg mt-4  hover:bg-mgray"
+            className="w-full flex items-center justify-center bg-mgray border rounded-lg focus:outline-none text-white py-2 rounded-lg mt-4 hover:bg-mgray"
           >
             Login
           </button>
+
+          {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+          {success && (
+            <p className="text-green-500 mt-4 text-center">{success}</p>
+          )}
+
           <button className="w-full flex items-center bg-mgray border border-gray-300 rounded-lg focus:outline-none text-white py-2 mt-4 hover:bg-mgray">
             <img
               src={googleLogo}
