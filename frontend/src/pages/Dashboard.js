@@ -14,6 +14,13 @@ import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import TransferWithinAStationIcon from "@mui/icons-material/TransferWithinAStation";
 
+// Utility function to decode HTML entities
+const decodeHtmlEntities = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = text;
+  return textarea.value;
+};
+
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
@@ -218,23 +225,19 @@ const Dashboard = () => {
                           <DirectionsWalkIcon className="text-green-400 mr-4" />
                         )}
                         {step.travel_mode === "TRANSIT" && (
-                          <DirectionsBusIcon className="text-yellow-400 mr-4" />
+                          <TransferWithinAStationIcon className="text-yellow-400 mr-4" />
                         )}
-                        {step.transit && step.transit.line && (
-                          <span className="text-white">
-                            {step.transit.line.vehicle.name} #
-                            {step.transit.line.short_name}
-                          </span>
+                        {step.travel_mode === "DRIVING" && (
+                          <DirectionsCarIcon className="text-blue-400 mr-4" />
                         )}
-                        <span className="text-gray-300 ml-4">
-                          {step.instructions}
-                        </span>
 
-                        {step.transit && step.transit.num_stops > 1 && (
-                          <span className="text-gray-400 ml-2">
-                            ({step.transit.num_stops} stops)
-                          </span>
-                        )}
+                        {/* Render HTML safely */}
+                        <span
+                          className="text-gray-300 ml-4"
+                          dangerouslySetInnerHTML={{
+                            __html: decodeHtmlEntities(step.instructions),
+                          }}
+                        />
                       </div>
                     ))}
                 </div>
@@ -243,9 +246,12 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-      {/* Google Map */}
-      <div className="flex-grow p-4">
-        <LoadScript googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s">
+
+      {/* Right Content: Map */}
+      <div className={`flex-grow relative`}>
+        <LoadScript
+          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+        >
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={center}
@@ -254,7 +260,9 @@ const Dashboard = () => {
             {directions && (
               <DirectionsRenderer
                 directions={directions}
-                options={{ polylineOptions: getPolylineOptions() }}
+                options={{
+                  polylineOptions: getPolylineOptions(),
+                }}
               />
             )}
           </GoogleMap>
