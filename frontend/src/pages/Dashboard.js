@@ -14,13 +14,6 @@ import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import TransferWithinAStationIcon from "@mui/icons-material/TransferWithinAStation";
 
-// Utility function to decode HTML entities
-const decodeHtmlEntities = (text) => {
-  const textarea = document.createElement("textarea");
-  textarea.innerHTML = text;
-  return textarea.value;
-};
-
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
@@ -31,6 +24,11 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [travelMode, setTravelMode] = useState("TRANSIT"); // Default mode is Bus
 
+  const decodeHtmlEntities = (text) => {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = text;
+    return textarea.value;
+  };
   // Fetch current location and convert to address with high accuracy
   const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -225,19 +223,26 @@ const Dashboard = () => {
                           <DirectionsWalkIcon className="text-green-400 mr-4" />
                         )}
                         {step.travel_mode === "TRANSIT" && (
-                          <TransferWithinAStationIcon className="text-yellow-400 mr-4" />
+                          <DirectionsBusIcon className="text-yellow-400 mr-4" />
                         )}
-                        {step.travel_mode === "DRIVING" && (
-                          <DirectionsCarIcon className="text-blue-400 mr-4" />
+                        {step.transit && step.transit.line && (
+                          <span className="text-white">
+                            {step.transit.line.vehicle.name} #
+                            {step.transit.line.short_name}
+                          </span>
                         )}
-
-                        {/* Render HTML safely */}
                         <span
                           className="text-gray-300 ml-4"
                           dangerouslySetInnerHTML={{
                             __html: decodeHtmlEntities(step.instructions),
                           }}
-                        />
+                        ></span>
+
+                        {step.transit && step.transit.num_stops > 1 && (
+                          <span className="text-gray-400 ml-2">
+                            ({step.transit.num_stops} stops)
+                          </span>
+                        )}
                       </div>
                     ))}
                 </div>
@@ -246,12 +251,9 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-
-      {/* Right Content: Map */}
-      <div className={`flex-grow relative`}>
-        <LoadScript
-          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-        >
+      {/* Google Map */}
+      <div className="flex-grow p-4">
+        <LoadScript googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={center}
@@ -260,9 +262,7 @@ const Dashboard = () => {
             {directions && (
               <DirectionsRenderer
                 directions={directions}
-                options={{
-                  polylineOptions: getPolylineOptions(),
-                }}
+                options={{ polylineOptions: getPolylineOptions() }}
               />
             )}
           </GoogleMap>
