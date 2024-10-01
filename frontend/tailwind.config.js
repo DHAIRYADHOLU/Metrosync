@@ -5,7 +5,7 @@ module.exports = {
       colors: {
         mgray: "#212121",
         mlightgray: "#2f2f2f",
-        lwhite: "#d1cec9",
+        sidegray: "#4d4d4d",
       },
     },
   },

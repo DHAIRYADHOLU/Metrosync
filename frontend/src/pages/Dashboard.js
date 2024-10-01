@@ -226,11 +226,11 @@ const Dashboard = () => {
       {/* Left Sidebar */}
       <div
         className={`${
-          sidebarOpen ? "w-1/3" : "w-15"
-        } bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`} // Added h-screen and overflow-y-auto
+          sidebarOpen ? "w-1/4" : "w-16"
+        } bg-sidegray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`} // Added h-screen and overflow-y-auto
       >
         <MenuOpenIcon
-          className="cursor-pointer m-5 "
+          className="cursor-pointer  "
           onClick={() => setSidebarOpen(!sidebarOpen)}
         />
         {sidebarOpen && (
