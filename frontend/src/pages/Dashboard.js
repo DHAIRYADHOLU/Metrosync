@@ -249,7 +249,7 @@ const Dashboard = () => {
                 placeholder="From"
                 value={startAddress}
                 onChange={(e) => setStartAddress(e.target.value)}
-                className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent focus:outline-none text-white"
+                className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent  focus:outline-none text-white"
               />
               <GpsFixedIcon
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-white"
@@ -348,7 +348,13 @@ const Dashboard = () => {
             mapContainerStyle={mapContainerStyle}
             center={center}
             zoom={12}
-            // options={{ styles: darkModeStyle }}
+            options={{
+              styles: darkModeStyle,
+              mapTypeControl: true, // Ensure map type control is enabled
+              mapTypeControlOptions: {
+                position: window.google.maps.ControlPosition.TOP_RIGHT, // Move controls to the top-right corner
+              },
+            }}
           >
             {directions && (
               <DirectionsRenderer
