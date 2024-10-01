@@ -136,7 +136,7 @@ const Dashboard = () => {
       {/* Left Sidebar */}
       <div
         className={`${
-          sidebarOpen ? "w-1/4" : "w-0"
+          sidebarOpen ? "w-1/3" : "w-0"
         } bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto hide-scrollbars`} // Added h-screen and overflow-y-auto
       >
         <MenuOpenIcon
@@ -216,14 +216,14 @@ const Dashboard = () => {
                     steps.map((step, index) => (
                       <div
                         key={index}
-                        className="flex items-center my-4 p-2 bg-gray-800 rounded-lg"
+                        className="flex items-center my-4 p-4 bg-gray-800 rounded-lg"
                       >
                         {/* Show relevant icons based on the type of step */}
                         {step.travel_mode === "WALKING" && (
-                          <DirectionsWalkIcon className="text-green-400 mr-4" />
+                          <DirectionsWalkIcon className="text-green-400 mr-0.5" />
                         )}
                         {step.travel_mode === "TRANSIT" && (
-                          <DirectionsBusIcon className="text-yellow-400 mr-4" />
+                          <DirectionsBusIcon className="text-red-700 mr-0.5" />
                         )}
                         {step.transit && step.transit.line && (
                           <span className="text-white">
