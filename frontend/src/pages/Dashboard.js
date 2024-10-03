@@ -21,7 +21,7 @@ const Dashboard = () => {
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
   const [steps, setSteps] = useState([]); // Added state to hold step-by-step directions
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [travelMode, setTravelMode] = useState("TRANSIT"); // Default mode is Bus
 
   const decodeHtmlEntities = (text) => {
@@ -343,18 +343,19 @@ const Dashboard = () => {
       </div>
       {/* Google Map */}
       <div className="flex-grow p-0">
+        <div className="absolute top-5 left-20 z-10">
+          <input
+            type="text"
+            placeholder="Search places..."
+            className="w-72 p-2 bg-white rounded-lg shadow-lg focus:outline-none"
+          />
+        </div>
         <LoadScript googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={center}
             zoom={12}
-            options={{
-              styles: darkModeStyle,
-              mapTypeControl: true, // Ensure map type control is enabled
-              mapTypeControlOptions: {
-                position: window.google.maps.ControlPosition.TOP_RIGHT, // Move controls to the top-right corner
-              },
-            }}
+            options={{ styles: darkModeStyle, mapTypeControl: false }}
           >
             {directions && (
               <DirectionsRenderer
