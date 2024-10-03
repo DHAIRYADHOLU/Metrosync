@@ -362,7 +362,12 @@ const Dashboard = () => {
             )}
             <div>
               <Select
-                options={[]}
+                options={[
+                  { id: 1, name: "Option 1" },
+                  { id: 2, name: "Option 2" },
+                  { id: 3, name: "Option 3" },
+                  // Add more options as needed
+                ]}
                 labelField="name"
                 valueField="id"
                 onChange={(values) => this.setValues(values)}
