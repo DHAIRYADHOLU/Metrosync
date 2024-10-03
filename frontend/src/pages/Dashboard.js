@@ -4,6 +4,7 @@ import {
   LoadScript,
   DirectionsRenderer,
 } from "@react-google-maps/api";
+import Select from "react-dropdown-select";
 import MetrosyncLogo from "./assets/MetrosyncLogo.png";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
@@ -13,6 +14,8 @@ import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import TransferWithinAStationIcon from "@mui/icons-material/TransferWithinAStation";
+import SearchIcon from "@mui/icons-material/Search";
+import DirectionsIcon from "@mui/icons-material/Directions";
 
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
@@ -23,6 +26,7 @@ const Dashboard = () => {
   const [steps, setSteps] = useState([]); // Added state to hold step-by-step directions
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [travelMode, setTravelMode] = useState("TRANSIT"); // Default mode is Bus
+  const [value, setValues] = useState("");
 
   const decodeHtmlEntities = (text) => {
     const textarea = document.createElement("textarea");
@@ -226,8 +230,8 @@ const Dashboard = () => {
       {/* Left Sidebar */}
       <div
         className={`${
-          sidebarOpen ? "w-1/4" : "w-16"
-        } bg-sidegray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`} // Added h-screen and overflow-y-auto
+          sidebarOpen ? "w-1/5" : "w-16"
+        } bg-black p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav z-20`} // Added h-screen and overflow-y-auto
       >
         <MenuOpenIcon
           className="cursor-pointer  "
@@ -249,7 +253,7 @@ const Dashboard = () => {
                 placeholder="From"
                 value={startAddress}
                 onChange={(e) => setStartAddress(e.target.value)}
-                className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent  focus:outline-none text-white"
+                className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent focus:outline-none text-white"
               />
               <GpsFixedIcon
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-white"
@@ -343,13 +347,6 @@ const Dashboard = () => {
       </div>
       {/* Google Map */}
       <div className="flex-grow p-0">
-        <div className="absolute top-5 left-20 z-10">
-          <input
-            type="text"
-            placeholder="Search places..."
-            className="w-72 p-2 bg-white rounded-lg shadow-lg focus:outline-none"
-          />
-        </div>
         <LoadScript googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
@@ -363,6 +360,18 @@ const Dashboard = () => {
                 options={{ polylineOptions: getPolylineOptions() }}
               />
             )}
+            <div>
+              <Select
+                options={[]}
+                labelField="name"
+                valueField="id"
+                onChange={(values) => this.setValues(values)}
+                className="top-5 left-5"
+                style={{
+                  width: "25%",
+                }}
+              />
+            </div>
           </GoogleMap>
         </LoadScript>
       </div>
