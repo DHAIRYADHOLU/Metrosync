@@ -4,7 +4,6 @@ import {
   LoadScript,
   DirectionsRenderer,
 } from "@react-google-maps/api";
-import Select from "react-dropdown-select";
 import MetrosyncLogo from "./assets/MetrosyncLogo.png";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
@@ -13,9 +12,6 @@ import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
-import TransferWithinAStationIcon from "@mui/icons-material/TransferWithinAStation";
-import SearchIcon from "@mui/icons-material/Search";
-import DirectionsIcon from "@mui/icons-material/Directions";
 
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
@@ -23,17 +19,18 @@ const Dashboard = () => {
   const [directions, setDirections] = useState(null);
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
-  const [steps, setSteps] = useState([]); // Added state to hold step-by-step directions
+  const [steps, setSteps] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [travelMode, setTravelMode] = useState("TRANSIT"); // Default mode is Bus
-  const [value, setValues] = useState("");
+  const [travelMode, setTravelMode] = useState("TRANSIT");
+  const [startSuggestions, setStartSuggestions] = useState([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
 
   const decodeHtmlEntities = (text) => {
     const textarea = document.createElement("textarea");
     textarea.innerHTML = text;
     return textarea.value;
   };
-  // Fetch current location and convert to address with high accuracy
+
   const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -44,7 +41,7 @@ const Dashboard = () => {
 
           geocoder.geocode({ location: latLng }, (results, status) => {
             if (status === "OK" && results[0]) {
-              setStartAddress(results[0].formatted_address); // Set address in input
+              setStartAddress(results[0].formatted_address);
             } else {
               alert("Could not fetch address for the current location.");
             }
@@ -54,13 +51,55 @@ const Dashboard = () => {
           alert(`Failed to get current location: ${error.message}`);
         },
         {
-          enableHighAccuracy: true, // Enable high accuracy GPS
-          timeout: 10000, // Timeout after 10 seconds
-          maximumAge: 0, // No cached location data
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
         }
       );
     } else {
       alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleStartAddressChange = (e) => {
+    const inputValue = e.target.value;
+    setStartAddress(inputValue);
+
+    if (inputValue.length > 2) {
+      const service = new window.google.maps.places.AutocompleteService();
+      service.getPlacePredictions(
+        { input: inputValue },
+        (predictions, status) => {
+          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+            setStartSuggestions(predictions);
+          } else {
+            setStartSuggestions([]);
+          }
+        }
+      );
+    } else {
+      setStartSuggestions([]);
+    }
+  };
+
+  const handleDestinationChange = (e) => {
+    const inputValue = e.target.value;
+    setEndAddress(inputValue);
+
+    if (inputValue.length > 2) {
+      const service = new window.google.maps.places.AutocompleteService();
+      service.getPlacePredictions(
+        { input: inputValue },
+        (predictions, status) => {
+          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+            setDestinationSuggestions(predictions);
+          } else {
+            setDestinationSuggestions([]);
+          }
+        }
+      );
+    } else {
+      setDestinationSuggestions([]);
     }
   };
 
@@ -76,10 +115,10 @@ const Dashboard = () => {
             ? window.google.maps.TravelMode.TRANSIT
             : travelMode === "DRIVING"
             ? window.google.maps.TravelMode.DRIVING
-            : window.google.maps.TravelMode.WALKING, // Select mode based on choice
+            : window.google.maps.TravelMode.WALKING,
         ...(travelMode === "TRANSIT" && {
           transitOptions: {
-            modes: ["BUS", "SUBWAY"], // Specify transit options for buses and subways
+            modes: ["BUS", "SUBWAY"],
           },
         }),
       };
@@ -88,9 +127,9 @@ const Dashboard = () => {
         if (status === window.google.maps.DirectionsStatus.OK) {
           setDirections(result);
           const route = result.routes[0].legs[0];
-          setDistance((route.distance.value / 1000).toFixed(2)); // Convert meters to kilometers
-          setDuration((route.duration.value / 60).toFixed(2)); // Convert seconds to minutes
-          setSteps(route.steps); // Set step-by-step directions
+          setDistance((route.distance.value / 1000).toFixed(2));
+          setDuration((route.duration.value / 60).toFixed(2));
+          setSteps(route.steps);
         } else {
           console.error("Directions request failed due to " + status);
           alert("No route found. Please check your start and end addresses.");
@@ -106,34 +145,34 @@ const Dashboard = () => {
     height: "100%",
   };
 
-  const center = { lat: 43.7, lng: -79.4 }; // Toronto
+  const center = { lat: 43.7, lng: -79.4 };
 
-  // Define polyline styles based on travel mode
   const getPolylineOptions = () => {
     switch (travelMode) {
       case "TRANSIT":
         return {
-          strokeColor: "#FF0000", // Red color for Bus
+          strokeColor: "#FF0000",
           strokeOpacity: 0.8,
           strokeWeight: 6,
         };
       case "DRIVING":
         return {
-          strokeColor: "#0000FF", // Blue color for Car
+          strokeColor: "#0000FF",
           strokeOpacity: 0.8,
           strokeWeight: 6,
         };
       case "WALKING":
         return {
-          strokeColor: "#03fc0f", // Green color for Walking
+          strokeColor: "#03fc0f",
           strokeOpacity: 0.8,
           strokeWeight: 6,
-          strokeDashArray: [1, 1], // Dotted line for Walking
+          strokeDashArray: [1, 1],
         };
       default:
         return {};
     }
   };
+
   const darkModeStyle = [
     { elementType: "geometry", stylers: [{ color: "#212121" }] },
     { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
@@ -227,14 +266,13 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
-      {/* Left Sidebar */}
       <div
         className={`${
-          sidebarOpen ? "w-1/5" : "w-16"
-        } bg-black p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav z-20`} // Added h-screen and overflow-y-auto
+          sidebarOpen ? "w-1/4" : "w-16"
+        } bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`}
       >
         <MenuOpenIcon
-          className="cursor-pointer  "
+          className="cursor-pointer"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         />
         {sidebarOpen && (
@@ -252,23 +290,56 @@ const Dashboard = () => {
                 type="text"
                 placeholder="From"
                 value={startAddress}
-                onChange={(e) => setStartAddress(e.target.value)}
+                onChange={handleStartAddressChange}
                 className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent focus:outline-none text-white"
               />
               <GpsFixedIcon
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-white"
                 onClick={fetchCurrentLocation}
               />
+              {startSuggestions.length > 0 && (
+                <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
+                  {startSuggestions.map((suggestion, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-2 cursor-pointer hover:bg-gray-700"
+                      onClick={() => {
+                        setStartAddress(suggestion.description);
+                        setStartSuggestions([]);
+                      }}
+                    >
+                      {suggestion.description}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Destination"
-              value={endAddress}
-              onChange={(e) => setEndAddress(e.target.value)}
-              className="w-full px-4 py-2 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
-            />
+            <div className="relative w-full mb-10">
+              <input
+                type="text"
+                placeholder="Destination"
+                value={endAddress}
+                onChange={handleDestinationChange}
+                className="w-full px-4 py-2 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
+              />
+              {destinationSuggestions.length > 0 && (
+                <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
+                  {destinationSuggestions.map((suggestion, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-2 cursor-pointer hover:bg-gray-700"
+                      onClick={() => {
+                        setEndAddress(suggestion.description);
+                        setDestinationSuggestions([]);
+                      }}
+                    >
+                      {suggestion.description}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
-            {/* Travel Mode Icons */}
             <div className="flex justify-around mt-4">
               <DirectionsBusIcon
                 onClick={() => setTravelMode("TRANSIT")}
@@ -303,8 +374,6 @@ const Dashboard = () => {
               <div className="mt-10 pt-2 pb-2 pl-4 pr-4 bg-mlightgray">
                 <p>Distance: {distance} km</p>
                 <p>Estimated Time: {duration} mins</p>
-
-                {/* Step-by-step Directions */}
                 <div className="mt-10">
                   {steps.length > 0 &&
                     steps.map((step, index) => (
@@ -312,7 +381,6 @@ const Dashboard = () => {
                         key={index}
                         className="flex items-center my-4 p-4 bg-gray-800 rounded-lg"
                       >
-                        {/* Show relevant icons based on the type of step */}
                         {step.travel_mode === "WALKING" && (
                           <DirectionsWalkIcon className="text-green-400 mr-0.5" />
                         )}
@@ -331,7 +399,6 @@ const Dashboard = () => {
                             __html: decodeHtmlEntities(step.instructions),
                           }}
                         ></span>
-
                         {step.transit && step.transit.num_stops > 1 && (
                           <span className="text-gray-400 ml-2">
                             ({step.transit.num_stops} stops)
@@ -345,9 +412,11 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-      {/* Google Map */}
       <div className="flex-grow p-0">
-        <LoadScript googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s">
+        <LoadScript
+          googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s" // Replace with your actual API key
+          libraries={["places"]}
+        >
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={center}
@@ -360,23 +429,6 @@ const Dashboard = () => {
                 options={{ polylineOptions: getPolylineOptions() }}
               />
             )}
-            <div>
-              <Select
-                options={[
-                  { id: 1, name: "Option 1" },
-                  { id: 2, name: "Option 2" },
-                  { id: 3, name: "Option 3" },
-                  // Add more options as needed
-                ]}
-                labelField="name"
-                valueField="id"
-                onChange={(values) => this.setValues(values)}
-                className="top-5 left-5"
-                style={{
-                  width: "25%",
-                }}
-              />
-            </div>
           </GoogleMap>
         </LoadScript>
       </div>
