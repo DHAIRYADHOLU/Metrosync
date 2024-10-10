@@ -12,6 +12,7 @@ import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
@@ -128,7 +129,10 @@ const Dashboard = () => {
           setDirections(result);
           const route = result.routes[0].legs[0];
           setDistance((route.distance.value / 1000).toFixed(2));
-          setDuration((route.duration.value / 60).toFixed(2));
+          const totalMinutes = (route.duration.value / 60).toFixed(0);
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+          setDuration(`${hours}h ${minutes}m`);
           setSteps(route.steps);
         } else {
           console.error("Directions request failed due to " + status);
@@ -271,10 +275,21 @@ const Dashboard = () => {
           sidebarOpen ? "w-1/4" : "w-16"
         } bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`}
       >
-        <MenuOpenIcon
-          className="cursor-pointer"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        />
+        <div className="flex mb-10">
+          <MenuOpenIcon
+            className="cursor-pointer"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          />
+
+          {sidebarOpen && (
+            <AccountCircleIcon
+              className="text-white ml-auto mt-0.5"
+              fontSize="medium"
+            />
+          )}
+        </div>
+        {/* Add AccountCircleIcon here */}
+
         {sidebarOpen && (
           <div>
             <div className="flex items-center mt-2 mb-4">
@@ -373,7 +388,7 @@ const Dashboard = () => {
             {distance && duration && (
               <div className="mt-10 pt-2 pb-2 pl-4 pr-4 bg-mlightgray">
                 <p>Distance: {distance} km</p>
-                <p>Estimated Time: {duration} mins</p>
+                <p>Estimated Time: {duration}</p>
                 <div className="mt-10">
                   {steps.length > 0 &&
                     steps.map((step, index) => (
