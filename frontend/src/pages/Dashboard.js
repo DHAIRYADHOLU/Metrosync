@@ -13,6 +13,7 @@ import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DirectionsTrainIcon from "@mui/icons-material/Train";
 
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
@@ -116,12 +117,15 @@ const Dashboard = () => {
             ? window.google.maps.TravelMode.TRANSIT
             : travelMode === "DRIVING"
             ? window.google.maps.TravelMode.DRIVING
+            : travelMode === "TRAIN"
+            ? window.google.maps.TravelMode.TRANSIT // Use TRANSIT for train routes
             : window.google.maps.TravelMode.WALKING,
-        ...(travelMode === "TRANSIT" && {
-          transitOptions: {
-            modes: ["BUS", "SUBWAY"],
-          },
-        }),
+        ...(travelMode === "TRANSIT" ||
+          (travelMode === "TRAIN" && {
+            transitOptions: {
+              modes: ["BUS", "SUBWAY", "TRAIN"], // Include TRAIN mode
+            },
+          })),
       };
 
       directionsService.route(request, (result, status) => {
@@ -374,6 +378,13 @@ const Dashboard = () => {
                 onClick={() => setTravelMode("WALKING")}
                 className={`cursor-pointer text-white ${
                   travelMode === "WALKING" ? "text-green-400" : "text-white"
+                }`}
+                fontSize="large"
+              />
+              <DirectionsTrainIcon
+                onClick={() => setTravelMode("TRANSIT")}
+                className={`cursor-pointer text-white ${
+                  travelMode === "TRANSIT" ? "text-green-400" : "text-white"
                 }`}
                 fontSize="large"
               />
