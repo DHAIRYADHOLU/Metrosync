@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ProfileView from "./ProfileView";
 import {
   GoogleMap,
   LoadScript,
@@ -305,21 +306,7 @@ const Dashboard = () => {
         </div>
         {profileView ? (
           // Profile sidebar view
-          <div>
-            <button
-              onClick={handleGoBack}
-              className="bg-transparent border border-white py-2 px-4 mb-4 rounded-lg text-white"
-            >
-              Go Back
-            </button>
-            <h2 className="text-lg font-semibold mb-6">Profile Info</h2>
-            <button className="w-full bg-gray-700 text-white py-2 px-4 rounded-lg mb-4">
-              Profile Info
-            </button>
-            <button className="w-full bg-gray-700 text-white py-2 px-4 rounded-lg">
-              Logout
-            </button>
-          </div>
+          <ProfileView onGoBack={handleGoBack} />
         ) : (
           // Main sidebar view
           <div>
@@ -438,14 +425,24 @@ const Dashboard = () => {
                             {step.transit &&
                               step.transit.line &&
                               step.transit &&
-                              step.transit.arrival_time && (
+                              step.transit.arrival_time &&
+                              step.transit &&
+                              step.transit.num_stops > 1 && (
                                 <span className="text-white w-full">
                                   {step.transit.line.vehicle.name}{" "}
                                   <span className="inline">{`#${step.transit.line.short_name}`}</span>
                                   <br />
                                   {step.transit.departure_time.text}
+                                  <br></br>
+                                  stops : {step.transit.num_stops}
                                 </span>
                               )}
+                            {/* 
+{step.transit && step.transit.num_stops > 1 && (
+                              <span className="text-gray-400 text-sm ml-2">
+                                (stops:{step.transit.num_stops})
+                              </span>
+                            )} */}
                             <span
                               className="text-gray-300 ml-4"
                               dangerouslySetInnerHTML={{
@@ -482,7 +479,7 @@ const Dashboard = () => {
             mapContainerStyle={mapContainerStyle}
             center={center}
             zoom={12}
-            options={{ styles: darkModeStyle, mapTypeControl: false }}
+            // options={{ styles: darkModeStyle, mapTypeControl: false }}
           >
             {directions && (
               <DirectionsRenderer
