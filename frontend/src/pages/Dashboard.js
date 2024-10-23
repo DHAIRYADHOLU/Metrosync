@@ -479,7 +479,7 @@ const Dashboard = () => {
             mapContainerStyle={mapContainerStyle}
             center={center}
             zoom={12}
-            // options={{ styles: darkModeStyle, mapTypeControl: false }}
+            options={{ styles: darkModeStyle, mapTypeControl: false }}
           >
             {directions && (
               <DirectionsRenderer
