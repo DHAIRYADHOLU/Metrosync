@@ -15,7 +15,7 @@ import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsTrainIcon from "@mui/icons-material/Train";
-
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
@@ -287,7 +287,7 @@ const Dashboard = () => {
       <div
         className={`bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`}
         style={{
-          width: sidebarOpen ? "30%" : "4%",
+          width: sidebarOpen ? "25%" : "5%",
           transition: "width 0.3s ease-in-out", // Added transition here for width
         }}
       >
@@ -349,14 +349,16 @@ const Dashboard = () => {
                     </ul>
                   )}
                 </div>
-                <div className="relative w-full mb-10">
+                <div className="relative w-full">
                   <input
                     type="text"
                     placeholder="Destination"
                     value={endAddress}
                     onChange={handleDestinationChange}
-                    className="w-full px-4 py-2 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
+                    className="w-full px-4 py-2 pr-10 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
                   />
+                  <BookmarkBorderIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white" />
+
                   {destinationSuggestions.length > 0 && (
                     <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
                       {destinationSuggestions.map((suggestion, index) => (

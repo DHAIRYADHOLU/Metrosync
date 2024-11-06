@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ProfileView from "./ProfileView";
 import {
   GoogleMap,
   LoadScript,
@@ -14,7 +15,7 @@ import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsTrainIcon from "@mui/icons-material/Train";
-
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
@@ -26,6 +27,15 @@ const Dashboard = () => {
   const [travelMode, setTravelMode] = useState("TRANSIT");
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
+  const [profileView, setProfileView] = useState(false);
+
+  const handleProfileClick = () => {
+    setProfileView(true); // Switch to profile view
+  };
+
+  const handleGoBack = () => {
+    setProfileView(false); // Switch back to the main sidebar view
+  };
 
   const decodeHtmlEntities = (text) => {
     const textarea = document.createElement("textarea");
@@ -275,169 +285,193 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       <div
-        className={`${
-          sidebarOpen ? "w-1/4" : "w-16"
-        } bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`}
+        className={`bg-mgray p-4 transition-all duration-300 ease-in-out h-screen overflow-y-auto left-side-nav`}
+        style={{
+          width: sidebarOpen ? "25%" : "5%",
+          transition: "width 0.3s ease-in-out", // Added transition here for width
+        }}
       >
         <div className="flex mb-10">
           <MenuOpenIcon
             className="cursor-pointer"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           />
-
           {sidebarOpen && (
             <AccountCircleIcon
-              className="text-white ml-auto mt-0.5"
+              className="text-white ml-auto mt-0.5 cursor-pointer"
               fontSize="medium"
+              onClick={handleProfileClick} // Clicking the profile icon toggles the profile view
             />
           )}
         </div>
-        {/* Add AccountCircleIcon here */}
-
-        {sidebarOpen && (
+        {profileView ? (
+          // Profile sidebar view
+          <ProfileView onGoBack={handleGoBack} />
+        ) : (
+          // Main sidebar view
           <div>
-            <div className="flex items-center mt-2 mb-4">
-              <img
-                src={MetrosyncLogo}
-                alt="Metrosync Logo"
-                className="w-14 h-14 mr-2"
-              />
-              <h2 className="text-xl font-semibold">Metrosync</h2>
-            </div>
-            <div className="relative w-full mb-10">
-              <input
-                type="text"
-                placeholder="From"
-                value={startAddress}
-                onChange={handleStartAddressChange}
-                className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent focus:outline-none text-white"
-              />
-              <GpsFixedIcon
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-white"
-                onClick={fetchCurrentLocation}
-              />
-              {startSuggestions.length > 0 && (
-                <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
-                  {startSuggestions.map((suggestion, index) => (
-                    <li
-                      key={index}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-700"
-                      onClick={() => {
-                        setStartAddress(suggestion.description);
-                        setStartSuggestions([]);
-                      }}
-                    >
-                      {suggestion.description}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="relative w-full mb-10">
-              <input
-                type="text"
-                placeholder="Destination"
-                value={endAddress}
-                onChange={handleDestinationChange}
-                className="w-full px-4 py-2 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
-              />
-              {destinationSuggestions.length > 0 && (
-                <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
-                  {destinationSuggestions.map((suggestion, index) => (
-                    <li
-                      key={index}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-700"
-                      onClick={() => {
-                        setEndAddress(suggestion.description);
-                        setDestinationSuggestions([]);
-                      }}
-                    >
-                      {suggestion.description}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="flex justify-around mt-4">
-              <DirectionsBusIcon
-                onClick={() => setTravelMode("TRANSIT")}
-                className={`cursor-pointer text-white ${
-                  travelMode === "TRANSIT" ? "text-green-400" : "text-white"
-                }`}
-                fontSize="large"
-              />
-              <DirectionsCarIcon
-                onClick={() => setTravelMode("DRIVING")}
-                className={`cursor-pointer text-white ${
-                  travelMode === "DRIVING" ? "text-green-400" : "text-white"
-                }`}
-                fontSize="large"
-              />
-              <DirectionsWalkIcon
-                onClick={() => setTravelMode("WALKING")}
-                className={`cursor-pointer text-white ${
-                  travelMode === "WALKING" ? "text-green-400" : "text-white"
-                }`}
-                fontSize="large"
-              />
-              <DirectionsTrainIcon
-                onClick={() => setTravelMode("TRANSIT")}
-                className={`cursor-pointer text-white ${
-                  travelMode === "TRANSIT" ? "text-green-400" : "text-white"
-                }`}
-                fontSize="large"
-              />
-            </div>
-
-            <button
-              onClick={handleGo}
-              className="w-full flex items-center justify-center bg-transparent border border-blue-400 rounded-lg focus:outline-none text-white py-2 mt-10"
-            >
-              Go
-            </button>
-            {distance && duration && (
-              <div className="mt-10 pt-2 pb-2 pl-4 pr-4 bg-mlightgray">
-                <p>Distance: {distance} km</p>
-                <p>Estimated Time: {duration}</p>
-                <div className="mt-10">
-                  {steps.length > 0 &&
-                    steps.map((step, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center my-4 p-4 bg-gray-800 rounded-lg"
-                      >
-                        {step.travel_mode === "WALKING" && (
-                          <DirectionsWalkIcon className="text-green-400 mr-0.5" />
-                        )}
-                        {step.travel_mode === "TRANSIT" && (
-                          <DirectionsBusIcon className="text-red-700 mr-0.5" />
-                        )}
-                        {step.transit && step.transit.line && (
-                          <span className="text-white">
-                            {step.transit.line.vehicle.name} #
-                            {step.transit.line.short_name}
-                          </span>
-                        )}
-                        <span
-                          className="text-gray-300 ml-4"
-                          dangerouslySetInnerHTML={{
-                            __html: decodeHtmlEntities(step.instructions),
-                          }}
-                        ></span>
-                        {step.transit && step.transit.num_stops > 1 && (
-                          <span className="text-gray-400 ml-2">
-                            ({step.transit.num_stops} stops)
-                          </span>
-                        )}
-                      </div>
-                    ))}
+            {sidebarOpen && (
+              <div>
+                <div className="flex items-center mt-2 mb-4">
+                  <img
+                    src={MetrosyncLogo}
+                    alt="Metrosync Logo"
+                    className="w-14 h-14 mr-2"
+                  />
+                  <h2 className="text-xl font-semibold">Metrosync</h2>
                 </div>
+                <div className="relative w-full mb-10">
+                  <input
+                    type="text"
+                    placeholder="From"
+                    value={startAddress}
+                    onChange={handleStartAddressChange}
+                    className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent focus:outline-none text-white"
+                  />
+                  <GpsFixedIcon
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-white"
+                    onClick={fetchCurrentLocation}
+                  />
+                  {startSuggestions.length > 0 && (
+                    <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
+                      {startSuggestions.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-700"
+                          onClick={() => {
+                            setStartAddress(suggestion.description);
+                            setStartSuggestions([]);
+                          }}
+                        >
+                          {suggestion.description}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Destination"
+                    value={endAddress}
+                    onChange={handleDestinationChange}
+                    className="w-full px-4 py-2 pr-10 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
+                  />
+                  <BookmarkBorderIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white" />
+
+                  {destinationSuggestions.length > 0 && (
+                    <ul className="absolute z-10 bg-gray-800 rounded-lg shadow-lg w-full">
+                      {destinationSuggestions.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-700"
+                          onClick={() => {
+                            setEndAddress(suggestion.description);
+                            setDestinationSuggestions([]);
+                          }}
+                        >
+                          {suggestion.description}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div className="flex justify-around mt-4">
+                  <DirectionsBusIcon
+                    onClick={() => setTravelMode("TRANSIT")}
+                    className={`cursor-pointer text-white ${
+                      travelMode === "TRANSIT" ? "text-green-400" : "text-white"
+                    }`}
+                    fontSize="large"
+                  />
+                  <DirectionsCarIcon
+                    onClick={() => setTravelMode("DRIVING")}
+                    className={`cursor-pointer text-white ${
+                      travelMode === "DRIVING" ? "text-green-400" : "text-white"
+                    }`}
+                    fontSize="large"
+                  />
+                  <DirectionsWalkIcon
+                    onClick={() => setTravelMode("WALKING")}
+                    className={`cursor-pointer text-white ${
+                      travelMode === "WALKING" ? "text-green-400" : "text-white"
+                    }`}
+                    fontSize="large"
+                  />
+                </div>
+
+                <button
+                  onClick={handleGo}
+                  className="w-full flex items-center justify-center bg-transparent border border-blue-400 rounded-lg focus:outline-none text-white py-2 mt-10"
+                >
+                  Go
+                </button>
+                {distance && duration && (
+                  <div className="mt-10 pt-2 pb-2 pl-2 pr-2 bg-mlightgray">
+                    <p>Distance: {distance} km</p>
+                    <p>Estimated Time: {duration}</p>
+                    <div className="mt-10">
+                      {steps.length > 0 &&
+                        steps.map((step, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center my-4 p-2 bg-gray-800 rounded-lg"
+                          >
+                            {step.travel_mode === "WALKING" && (
+                              <DirectionsWalkIcon className="text-green-400 mr-0.5" />
+                            )}
+                            {step.travel_mode === "TRANSIT" && (
+                              <DirectionsBusIcon className="text-red-700 mr-4" />
+                            )}
+                            {step.transit &&
+                              step.transit.line &&
+                              step.transit &&
+                              step.transit.arrival_time &&
+                              step.transit &&
+                              step.transit.num_stops > 1 && (
+                                <span className="text-white w-full">
+                                  {step.transit.line.vehicle.name}{" "}
+                                  <span className="inline">{`#${step.transit.line.short_name}`}</span>
+                                  <br />
+                                  {step.transit.departure_time.text}
+                                  <br></br>
+                                  stops : {step.transit.num_stops}
+                                </span>
+                              )}
+                            {/* 
+{step.transit && step.transit.num_stops > 1 && (
+                              <span className="text-gray-400 text-sm ml-2">
+                                (stops:{step.transit.num_stops})
+                              </span>
+                            )} */}
+                            <span
+                              className="text-gray-300 ml-4"
+                              dangerouslySetInnerHTML={{
+                                __html: decodeHtmlEntities(step.instructions),
+                              }}
+                            ></span>
+                            {/* {step.transit && step.transit.num_stops > 1 && (
+                              <span className="text-gray-400 text-sm ml-2">
+                                (stops:{step.transit.num_stops})
+                              </span>
+                            )} */}
+                            {/* {step.transit && step.transit.arrival_time && (
+                              <span className="text-gray-400 text-sm ml-2">
+                                {step.transit.departure_time.text}
+                              </span>
+                            )} */}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         )}
       </div>
+      {/* Main content of the dashboard */}
       <div className="flex-grow p-0">
         <LoadScript
           googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s" // Replace with your actual API key
