@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import ProfileView from "./ProfileView";
+import axios from "axios";
+
 import {
   GoogleMap,
   LoadScript,
@@ -14,7 +17,7 @@ import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import DirectionsTrainIcon from "@mui/icons-material/Train";
+
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 const Dashboard = () => {
   const [startAddress, setStartAddress] = useState("");
@@ -29,6 +32,23 @@ const Dashboard = () => {
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [profileView, setProfileView] = useState(false);
 
+  const [weather, setWeather] = useState(null);
+  useEffect(() => {
+    const fetchWeather = async () => {
+      const API_KEY = "992cbef55bd630ba8762f3d2d3a2b914";
+      const city = "Toronto";
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+      try {
+        const response = await axios.get(url);
+        setWeather(response.data);
+      } catch (error) {
+        console.error("Error fetching weather data:", error);
+      }
+    };
+
+    fetchWeather();
+  }, []);
   const handleProfileClick = () => {
     setProfileView(true); // Switch to profile view
   };
@@ -312,6 +332,19 @@ const Dashboard = () => {
           <div>
             {sidebarOpen && (
               <div>
+                <div>
+                  {weather ? (
+                    <div>
+                      <a className="text-sm font-bold">{weather.name}, </a>
+                      <a className="text-sm">
+                        {weather.weather[0].description}
+                      </a>
+                      <p className="text-lg font-bold">{weather.main.temp}°C</p>
+                    </div>
+                  ) : (
+                    <p>Loading weather...</p>
+                  )}
+                </div>
                 <div className="flex items-center mt-2 mb-4">
                   <img
                     src={MetrosyncLogo}
@@ -475,7 +508,7 @@ const Dashboard = () => {
       <div className="flex-grow p-0">
         <LoadScript
           googleMapsApiKey="AIzaSyCn3eXSLyVnjmy_RcstFLDGA9gjVeLhW0s" // Replace with your actual API key
-          libraries={["places"]}
+          libraries={["places, landmarks"]}
         >
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
