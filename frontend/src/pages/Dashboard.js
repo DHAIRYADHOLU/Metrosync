@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import TicketPurchaseModal from "./TicketPurchaseModal";
 import ProfileView from "./ProfileView";
 import axios from "axios";
 
@@ -302,6 +302,11 @@ const Dashboard = () => {
     },
   ];
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       <div
@@ -311,14 +316,22 @@ const Dashboard = () => {
           transition: "width 0.3s ease-in-out", // Added transition here for width
         }}
       >
-        <div className="flex mb-10">
+        <div className="flex mb-2">
           <MenuOpenIcon
             className="cursor-pointer"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           />
+          <div className="flex items-center mb-5">
+            <img
+              src={MetrosyncLogo}
+              alt="Metrosync Logo"
+              className="w-8 h-8 ml-14"
+            />
+            <h2 className="text-xl font-semibold">Metrosync</h2>
+          </div>
           {sidebarOpen && (
             <AccountCircleIcon
-              className="text-white ml-auto mt-0.5 cursor-pointer"
+              className="text-white ml-auto mt-1 cursor-pointer"
               fontSize="medium"
               onClick={handleProfileClick} // Clicking the profile icon toggles the profile view
             />
@@ -345,15 +358,15 @@ const Dashboard = () => {
                     <p>Loading weather...</p>
                   )}
                 </div>
-                <div className="flex items-center mt-2 mb-4">
+                {/* <div className="flex items-center mt-2 mb-4">
                   <img
                     src={MetrosyncLogo}
                     alt="Metrosync Logo"
                     className="w-14 h-14 mr-2"
                   />
                   <h2 className="text-xl font-semibold">Metrosync</h2>
-                </div>
-                <div className="relative w-full mb-10">
+                </div> */}
+                <div className="relative w-full mt-8 mb-10">
                   <input
                     type="text"
                     placeholder="From"
@@ -440,6 +453,19 @@ const Dashboard = () => {
                 >
                   Go
                 </button>
+                <button
+                  className="w-full max-w-xs flex items-center justify-center bg-transparent border border-blue-400 rounded-lg focus:outline-none text-white py-2 mt-10"
+                  onClick={openModal}
+                >
+                  Buy Ticket
+                </button>
+
+                {/* Ticket Purchase Modal */}
+                <TicketPurchaseModal
+                  isOpen={isModalOpen}
+                  onClose={closeModal}
+                />
+
                 {distance && duration && (
                   <div className="mt-10 pt-2 pb-2 pl-2 pr-2 bg-mlightgray">
                     <p>Distance: {distance} km</p>
