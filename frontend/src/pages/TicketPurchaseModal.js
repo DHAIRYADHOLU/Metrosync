@@ -6,6 +6,8 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const [errors, setErrors] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [ticketDetails, setTicketDetails] = useState(null);
 
   const validateFields = () => {
     const errors = {};
@@ -21,9 +23,9 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
     }
 
     // Validate Expiry Date
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-      errors.expiry = "Expiry must be in MM/YY format.";
-    }
+    // if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+    //   errors.expiry = "Expiry must be in MM/YY format.";
+    // }
 
     // Validate CVC
     if (!/^\d{3}$/.test(cvc)) {
@@ -37,12 +39,62 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateFields()) {
-      alert("Payment successful!");
-      onClose();
+      setIsProcessing(true);
+
+      // Simulate processing delay
+      setTimeout(() => {
+        const ticket = {
+          passengerName,
+          transitMode: "TTC (Toronto Transit Commission)",
+          price: "$3.30",
+          timestamp: new Date().toLocaleString(),
+        };
+        setTicketDetails(ticket);
+        setIsProcessing(false);
+      }, 2000); // 2 seconds delay
     }
   };
 
-  if (!isOpen) return null; // Don't render anything if the modal is closed
+  if (!isOpen) return null;
+
+  if (isProcessing) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="bg-white text-gray-900 rounded-lg shadow-lg p-6 w-80 text-center">
+          <h2 className="text-xl font-bold">Processing Payment...</h2>
+          <p className="text-gray-700 mt-2">Please wait a moment.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (ticketDetails) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="bg-white text-gray-900 rounded-lg shadow-lg p-6 w-96">
+          <h2 className="text-xl font-bold mb-4">Ticket Confirmation</h2>
+          <p>
+            <strong>Passenger Name:</strong> {ticketDetails.passengerName}
+          </p>
+          <p>
+            <strong>Transit Mode:</strong> {ticketDetails.transitMode}
+          </p>
+          <p>
+            <strong>Price:</strong> {ticketDetails.price}
+          </p>
+          <p>
+            <strong>Issued At:</strong> {ticketDetails.timestamp}
+          </p>
+          <button
+            className="bg-blue-500 text-white rounded-lg px-4 py-2 mt-4"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -76,7 +128,7 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
               Select Transit Mode
             </label>
             <select className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-blue-500 focus:border-blue-500">
-              <option>TTC (Toronto Transit Comission)</option>
+              <option>TTC (Toronto Transit Commission)</option>
               <option>Go Transit</option>
             </select>
           </div>
@@ -84,7 +136,6 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
           {/* Ticket Summary */}
           <div className="border-t border-gray-300 pt-4">
             <h3 className="text-lg font-medium">Ticket Summary</h3>
-
             <p className="text-sm text-gray-700">
               <strong>Price:</strong> $3.30
             </p>
