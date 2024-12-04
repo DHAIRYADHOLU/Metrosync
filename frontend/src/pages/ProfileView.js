@@ -22,13 +22,11 @@ const ProfileView = ({ onGoBack }) => {
         />{" "}
         {/* Smaller icon */}
       </button>
-
-      <h3>
-        Darkmode <Switch defaultChecked />
-      </h3>
-
+      <p className="mt-6 mb-3">Settings</p>
+      <p className="mt-3 mb-3">Security & Privacy</p>
+      <p className="mt-3 mb-3">About app</p>
       <button
-        className="w-full bg-gray-700 text-white py-2 px-4 rounded-lg"
+        className="w-full bg-red-600 mt-10 text-white py-1 px-1 rounded-lg"
         onClick={handleLogout}
       >
         Logout
