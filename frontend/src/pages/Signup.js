@@ -127,6 +127,14 @@ const Signup = () => {
           >
             Signup
           </button>
+          <button className="w-full flex items-center bg-mgray border border-gray-300 rounded-lg focus:outline-none text-white py-2 mt-4 hover:bg-mgray">
+            <img
+              src={googleLogo}
+              alt="Google Logo"
+              className="w-8 h-8 mr-2 ml-2"
+            />
+            <span className="flex-grow text-center">Continue with Google</span>
+          </button>
           {signupSuccess && (
             <p className="text-green-500 mt-4 text-center">
               Signup successful!

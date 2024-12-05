@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { jsPDF } from "jspdf"; // Import jsPDF
 
 const TicketPurchaseModal = ({ isOpen, onClose }) => {
   const [passengerName, setPassengerName] = useState("");
@@ -21,11 +22,6 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
     if (!/^\d{16}$/.test(cardNumber)) {
       errors.cardNumber = "Card number must be 16 digits.";
     }
-
-    // Validate Expiry Date
-    // if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-    //   errors.expiry = "Expiry must be in MM/YY format.";
-    // }
 
     // Validate CVC
     if (!/^\d{3}$/.test(cvc)) {
@@ -51,8 +47,26 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
         };
         setTicketDetails(ticket);
         setIsProcessing(false);
-      }, 2000); // 2 seconds delay
+      }, 4000); // 4 seconds delay
     }
+  };
+
+  // Function to download the ticket as a PDF
+  const downloadTicketAsPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(16);
+
+    // Add ticket details to the PDF
+    doc.text(`Ticket Confirmation`, 20, 20);
+    doc.text(`Passenger Name: ${ticketDetails.passengerName}`, 20, 30);
+    doc.text(`Transit Mode: ${ticketDetails.transitMode}`, 20, 40);
+    doc.text(`Price: ${ticketDetails.price}`, 20, 50);
+    doc.text(`Issued At: ${ticketDetails.timestamp}`, 20, 60);
+
+    // Save the generated PDF
+    doc.save(`${ticketDetails.passengerName}_ticket.pdf`);
   };
 
   if (!isOpen) return null;
@@ -91,6 +105,12 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
           >
             Close
           </button>
+          <button
+            className="bg-green-500 text-white rounded-lg px-4 py-2 mt-4 ml-2"
+            onClick={downloadTicketAsPDF} // Trigger PDF download
+          >
+            Download PDF
+          </button>
         </div>
       </div>
     );
@@ -99,7 +119,7 @@ const TicketPurchaseModal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white text-gray-900 rounded-lg shadow-lg p-6 w-96">
-        <h2 className="text-xl font-bold mb-4">Buy City Bus Ticket</h2>
+        <h2 className="text-xl font-bold mb-4">Buy Transit Ticket</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Passenger Name */}
           <div>

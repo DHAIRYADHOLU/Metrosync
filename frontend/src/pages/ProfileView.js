@@ -22,9 +22,15 @@ const ProfileView = ({ onGoBack }) => {
         />{" "}
         {/* Smaller icon */}
       </button>
-      <p className="mt-6 mb-3">Settings</p>
-      <p className="mt-3 mb-3">Security & Privacy</p>
-      <p className="mt-3 mb-3">About app</p>
+      <p className="mt-6 mb-3">
+        <a href="">Settings</a>
+      </p>
+      <p className="mt-3 mb-3">
+        <a href="">Security & Privacy</a>
+      </p>
+      <p className="mt-3 mb-3">
+        <a href="">About app</a>
+      </p>
       <button
         className="w-full bg-red-600 mt-10 text-white py-1 px-1 rounded-lg"
         onClick={handleLogout}

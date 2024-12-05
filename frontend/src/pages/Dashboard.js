@@ -347,12 +347,14 @@ const Dashboard = () => {
               <div>
                 <div>
                   {weather ? (
-                    <div>
+                    <div className="mt-8">
                       <a className="text-sm font-bold">{weather.name}, </a>
                       <a className="text-sm">
                         {weather.weather[0].description}
                       </a>
-                      <p className="text-lg font-bold">{weather.main.temp}°C</p>
+                      <p className="text-lg font-bold">
+                        {Math.round(weather.main.temp)}°C
+                      </p>
                     </div>
                   ) : (
                     <p>Loading weather...</p>
@@ -372,7 +374,7 @@ const Dashboard = () => {
                     placeholder="From"
                     value={startAddress}
                     onChange={handleStartAddressChange}
-                    className="w-full px-4 py-2 border border-green-400 rounded-lg bg-transparent focus:outline-none text-white"
+                    className="w-full px-4 py-2 border border-gray-400 rounded-lg bg-transparent focus:outline-none text-white"
                   />
                   <GpsFixedIcon
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-white"
@@ -401,7 +403,7 @@ const Dashboard = () => {
                     placeholder="Destination"
                     value={endAddress}
                     onChange={handleDestinationChange}
-                    className="w-full px-4 py-2 pr-10 border border-red-400 rounded-lg bg-transparent focus:outline-none text-white"
+                    className="w-full px-4 py-2 pr-10 border border-gray-400 rounded-lg bg-transparent focus:outline-none text-white"
                   />
                   <BookmarkBorderIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white" />
 
@@ -449,12 +451,12 @@ const Dashboard = () => {
 
                 <button
                   onClick={handleGo}
-                  className="w-full flex items-center justify-center bg-transparent border border-blue-400 rounded-lg focus:outline-none text-white py-2 mt-10"
+                  className="w-full flex items-center justify-center bg-green-600 border border-green-400 rounded-lg focus:outline-none text-white py-2 mt-10"
                 >
                   Go
                 </button>
                 <button
-                  className="w-full max-w-xs flex items-center justify-center bg-transparent border border-blue-400 rounded-lg focus:outline-none text-white py-2 mt-10"
+                  className="w-full max-w-xs flex items-center justify-center bg-blue-500 border border-blue-400 rounded-lg focus:outline-none text-white py-2 mt-10"
                   onClick={openModal}
                 >
                   Buy Ticket

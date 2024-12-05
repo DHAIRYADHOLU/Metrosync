@@ -89,6 +89,11 @@ const Login = () => {
             Signup
           </Link>
         </h4>
+        <h4 className="mt-4 text-white text-center">
+          <Link to="/signup" className="text-blue-500 hover:underline">
+            Forgot Password?
+          </Link>
+        </h4>
       </div>
     </div>
   );
